@@ -7,10 +7,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Tour;
 use App\Models\Tourist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class TourController extends ApiController
 {
+    public function labels(Request $request)
+    {
+        $tours = Tour::pluck('name', 'id');
+        // $tours = Tour::select('id', 'name')->get();
+
+        return response()->json([
+            'data' => $tours,
+        ]);
+    }
     public function index(Request $request)
     {
         $request->validate([
@@ -49,6 +59,7 @@ class TourController extends ApiController
             'program_id' => 'required|exists:programs,id',
             'price' => 'required|integer',
             'number' => 'required|integer',
+            'date' => 'required|date',
         ]);
 
         $tourData = $validator->validated();
@@ -71,6 +82,7 @@ class TourController extends ApiController
             'program_id' => 'exists:programs,id',
             'price' => 'integer',
             'number' => 'integer',
+            'date' => 'date',
         ]);
 
         $tourData = $validator->validated();
@@ -94,7 +106,6 @@ class TourController extends ApiController
         $tourist = Tourist::where('id', $requestData['tourist_id'])->first();
 
         $tour->load('tourists');
-        $tourists = $tour->tourists;
 
         if ($tourist->tour_id == $tour->id) {
             return $this->showMessage('tourist already registered');
@@ -116,6 +127,25 @@ class TourController extends ApiController
         $tour->status = Tour::STATUS_OPENED;
         $tour->save();
         return $this->showMessage('tour is  opened');
+    }
+
+    public function attachTour(Tour $tour, Request $request)
+    {
+        $tourist = Auth::guard('tourist-api')->user();
+
+        if($tour->status == Tour::STATUS_OPENED){
+            return $this->showMessage('tour is already opened');
+        }
+
+        $tourExists = $tourist->tours->contains($tour->id);
+
+        if(!$tourExists){
+            $tourExists = $tourist->tours()->attach($tour->id);
+            return $this->showMessage('tour is added');
+        }else{
+            return $this->showMessage('tour is already added');
+        }
+
     }
 
 }

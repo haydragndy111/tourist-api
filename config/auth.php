@@ -41,10 +41,24 @@ return [
             'provider' => 'users',
         ],
 
+        // 'api'=>[
+
+        // ],
         'guide-api' => [
             'driver' => 'passport',
             'provider' => 'guides',
         ],
+
+        'admin-api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+        ],
+
+        'tourist-api' => [
+            'driver' => 'passport',
+            'provider' => 'tourists',
+        ],
+
 
     ],
 
@@ -74,6 +88,11 @@ return [
         'guides' => [
             'driver' => 'eloquent',
             'model' => App\Models\Guide::class,
+        ],
+
+        'tourists' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Tourist::class,
         ],
         // 'users' => [
         //     'driver' => 'database',

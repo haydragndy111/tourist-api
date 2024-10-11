@@ -21,6 +21,7 @@ class Tour extends Model
         'number',
         'name',
         'status',
+        'date',
     ];
 
     public function guide()
@@ -40,6 +41,6 @@ class Tour extends Model
 
     public function tourists()
     {
-        return $this->hasMany(Tourist::class);
+        return $this->belongsToMany(Tourist::class, 'tourist_tour');
     }
 }

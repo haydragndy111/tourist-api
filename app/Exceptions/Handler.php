@@ -129,6 +129,7 @@ class Handler extends ExceptionHandler
         if(config('app.debug')) {
             return parent::render($request, $exception);
         }
+        dd($exception);
         return $this->errorResponse('Unexpected Exception, Please Try later',500);
 
     }

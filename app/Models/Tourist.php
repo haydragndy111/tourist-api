@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
 
-class Tourist extends Model
+class Tourist extends Authenticatable
 {
     use HasApiTokens, HasFactory;
 
@@ -19,9 +21,15 @@ class Tourist extends Model
         'description',
     ];
 
-    public function tour()
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+
+    public function tours()
     {
-        return $this->belongsTo(Tour::class);
+        return $this->belongsToMany(Tour::class, 'tourist_tour');
     }
 
 }

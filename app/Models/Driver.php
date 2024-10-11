@@ -17,4 +17,9 @@ class Driver extends Model
         'plate_number',
         'description',
     ];
+
+    public function tours()
+    {
+        return $this->hasMany(Tour::class);
+    }
 }
