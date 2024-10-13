@@ -24,7 +24,7 @@ class AdminAuthController extends Controller
         $user = User::create($request->all());
 
         $data['user'] = $user;
-        $data['token'] = $user->createToken($request->email)->plainTextToken;
+        $data['token'] = $user->createToken($request->email)->accessToken;
 
         $response = [
             'status' => 'success',
@@ -46,8 +46,6 @@ class AdminAuthController extends Controller
             $user = User::where('email', $request->email)->first();
             // dd($user);
 
-            var jsonData = JSON.parse(responseBody);
-            postman.setEnvironmentVariable("auth", jsonData.plainTextToken);
             // Check password
             if(!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json([
@@ -75,7 +73,7 @@ class AdminAuthController extends Controller
     {
         try {
             $user = Auth::guard('admin-api')->user();
-            dd($user);
+            // dd($user);
             $user = User::findOrFail(Auth::id());
             $user->tokens()->delete();
             if ($logout) {

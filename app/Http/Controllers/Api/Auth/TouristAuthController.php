@@ -25,7 +25,7 @@ class TouristAuthController extends Controller
         $tourist = Tourist::create($request->all());
 
         $data['user'] = $tourist;
-        $data['token'] = $tourist->createToken('auth-token')->plainTextToken;
+        $data['token'] = $tourist->createToken('auth-token')->accessToken;
 
         $response = [
             'status' => 'success',
