@@ -54,7 +54,7 @@ class AdminAuthController extends Controller
                     ], 401);
             }
 
-            $data['user'] = $user;
+                $data['user'] = $user;
             $data['token'] = $user->createToken('token')->accessToken;
 
             $response = [

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\Tours;
 
 use App\Http\Controllers\ApiController;
-use App\Http\Controllers\Controller;
 use App\Models\Tour;
 use App\Models\Tourist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class TourController extends ApiController
 {
@@ -30,11 +30,11 @@ class TourController extends ApiController
         $number = $request->number;
         $name = $request->name;
 
-        $tours = Tour::when(isset($name), function($q) use ($name){
-                    $q->where('name', 'LIKE', '%'.$name.'%');
-                })->when(isset($number), function($q) use ($number){
-                    $q->where('number', $number);
-                })
+        $tours = Tour::when(isset($name), function ($q) use ($name) {
+            $q->where('name', 'LIKE', '%' . $name . '%');
+        })->when(isset($number), function ($q) use ($number) {
+            $q->where('number', $number);
+        })
             ->paginate(20);
 
         return response()->json([
@@ -44,7 +44,7 @@ class TourController extends ApiController
 
     public function show(Tour $tour)
     {
-        $tour = $tour->load(['guide','driver','program']);
+        $tour = $tour->load(['guide', 'driver', 'program']);
 
         return response()->json([
             'data' => $tour,
@@ -53,20 +53,31 @@ class TourController extends ApiController
 
     public function create(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'guide_id' => 'required|exists:guides,id',
             'driver_id' => 'required|exists:drivers,id',
             'program_id' => 'required|exists:programs,id',
             'price' => 'required|integer',
             'number' => 'required|integer',
             'date' => 'required|date',
+            'name' => 'required|string',
+            'status' => 'required',
         ]);
 
-        $tourData = $validator->validated();
+        $tourData = [
+            'guide_id' => $request->guide_id,
+            'driver_id' => $request->driver_id,
+            'program_id' => $request->program_id,
+            'price' => $request->price,
+            'number' => $request->number,
+            'date' => $request->date,
+            'name' => $request->name,
+            'status' => $request->status,
+        ];
 
         $tour = Tour::create($tourData);
 
-        $tour = $tour->load(['guide','driver','program']);
+        $tour = $tour->load(['guide', 'driver', 'program']);
 
         return response()->json([
             'data' => $tour,
@@ -76,20 +87,31 @@ class TourController extends ApiController
     public function edit(Tour $tour, Request $request)
     {
 
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'guide_id' => 'exists:guides,id',
             'driver_id' => 'exists:drivers,id',
             'program_id' => 'exists:programs,id',
             'price' => 'integer',
-            'number' => 'integer',
+            'number' => 'integer|unique:tours,number,' . $tour->id,
             'date' => 'date',
+            'name' => 'string',
+            'status' => 'integer|' . Rule::in([1, 2]),
         ]);
 
-        $tourData = $validator->validated();
+        $tourData = [
+            'guide_id' => $request->guide_id,
+            'driver_id' => $request->driver_id,
+            'program_id' => $request->program_id,
+            'price' => $request->price,
+            'number' => $request->number,
+            'date' => $request->date,
+            'name' => $request->name,
+            'status' => $request->status,
+        ];
 
         $tour->update($tourData);
 
-        $tour = $tour->load(['guide','driver','program']);
+        $tour = $tour->load(['guide', 'driver', 'program']);
         return response()->json([
             'data' => $tour,
         ]);
@@ -120,7 +142,7 @@ class TourController extends ApiController
 
     public function openTour(Tour $tour, Request $request)
     {
-        if($tour->status == Tour::STATUS_OPENED){
+        if ($tour->status == Tour::STATUS_OPENED) {
             return $this->showMessage('tour is already opened');
         }
 
@@ -133,16 +155,16 @@ class TourController extends ApiController
     {
         $tourist = Auth::guard('tourist-api')->user();
 
-        if($tour->status == Tour::STATUS_OPENED){
+        if ($tour->status == Tour::STATUS_OPENED) {
             return $this->showMessage('tour is already opened');
         }
 
         $tourExists = $tourist->tours->contains($tour->id);
 
-        if(!$tourExists){
+        if (!$tourExists) {
             $tourExists = $tourist->tours()->attach($tour->id);
             return $this->showMessage('tour is added');
-        }else{
+        } else {
             return $this->showMessage('tour is already added');
         }
 

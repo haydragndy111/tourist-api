@@ -73,7 +73,7 @@ class DriverController extends Controller
             'f_name' => 'string',
             'l_name' => 'string',
             'address' => 'string',
-            'plate_number' => 'string|unique:drivers,plate_number'. $driver->id,
+            'plate_number' => 'string|unique:drivers,plate_number,'. $driver->id,
             'description' => 'string',
         ]);
 

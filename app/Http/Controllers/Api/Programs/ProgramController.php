@@ -39,7 +39,7 @@ class ProgramController extends ApiController
 
     public function create(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = $request->validate([
             'type' => [
                 'string',
                 'required',
@@ -47,7 +47,12 @@ class ProgramController extends ApiController
             'name' => 'required|string',
             'description' => 'required|string',
         ]);
-        $programData = $validator->validated();
+
+        $programData = [
+            'type' => $request->type,
+            'name' => $request->name,
+            'description' => $request->description,
+        ];
 
         $program = Program::create($programData);
 
