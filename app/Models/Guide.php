@@ -17,4 +17,10 @@ class Guide extends Model
         'mobile',
         'description',
     ];
+
+    public function tours()
+    {
+        return $this->hasMany(Tour::class);
+    }
+
 }

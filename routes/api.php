@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Auth\TouristAuthController;
 use App\Http\Controllers\Api\Drivers\DriverController;
 use App\Http\Controllers\Api\Programs\ProgramController;
 use App\Http\Controllers\Api\Tours\TourController;
+use App\Http\Controllers\GuideController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +48,16 @@ Route::group([
     Route::post('/create', [DriverController::class, 'create']);
     Route::post('/{driver}/edit', [DriverController::class, 'edit']);
     Route::post('/{driver}/report', [DriverController::class, 'report']);
+});
+
+Route::group([
+    'prefix' => 'guides',
+    'middleware' => ['api',],
+], function () {
+    Route::get('/', [GuideController::class, 'index']);
+    Route::get('/{guide}', [GuideController::class, 'show']);
+    Route::post('/create', [GuideController::class, 'create']);
+    Route::post('/{guide}/edit', [GuideController::class, 'edit']);
 });
 
 Route::group([
