@@ -31,10 +31,10 @@ class TourController extends ApiController
         $name = $request->name;
 
         $tours = Tour::when(isset($name), function ($q) use ($name) {
-            $q->where('name', 'LIKE', '%' . $name . '%');
-        })->when(isset($number), function ($q) use ($number) {
-            $q->where('number', $number);
-        })
+                $q->where('name', 'LIKE', '%' . $name . '%');
+            })->when(isset($number), function ($q) use ($number) {
+                $q->where('numb er', $number);
+            })
             ->paginate(20);
 
         return response()->json([
@@ -120,12 +120,7 @@ class TourController extends ApiController
 
     public function addTourist(Tour $tour, Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'tourist_id' => 'exists:tourists,id',
-        ]);
-
-        $requestData = $validator->validated();
-        $tourist = Tourist::where('id', $requestData['tourist_id'])->first();
+        $tourist = Tourist::where('id', $tour->id)->first();
 
         $tour->load('tourists');
 
@@ -154,10 +149,6 @@ class TourController extends ApiController
     public function attachTour(Tour $tour, Request $request)
     {
         $tourist = Auth::guard('tourist-api')->user();
-
-        if ($tour->status == Tour::STATUS_OPENED) {
-            return $this->showMessage('tour is already opened');
-        }
 
         $tourExists = $tourist->tours->contains($tour->id);
 
